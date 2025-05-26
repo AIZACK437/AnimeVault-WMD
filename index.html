@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Anime Vault</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap" rel="stylesheet">
+
+  <style>
+    /* Splash Screen */
+    #splash-screen {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #0b202a, #152a32, #2d5465);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      color: #fff;
+      user-select: none;
+      opacity: 1;
+      transition: opacity 0.8s ease;
+    }
+
+    .sword {
+      width: 20px;
+      height: 80px;
+      background: linear-gradient(180deg, #a1c4fd, #3a7bd5);
+      box-shadow: 0 0 12px #a1c4fd, 0 0 20px #a1c4fd, 0 0 30px #a1c4fd;
+      border-radius: 3px;
+      margin: 0 10px;
+      position: relative;
+      animation: swordGlow 2s ease-in-out infinite alternate;
+    }
+
+    .sword::before {
+      content: '';
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 6px;
+      height: 20px;
+      background: #a1c4fd;
+      border-radius: 3px;
+      box-shadow: 0 0 10px #a1c4fd;
+      animation: swordGlow 2s ease-in-out infinite alternate;
+      animation-delay: 0.5s;
+    }
+
+    .sword.second {
+      animation-delay: 0.5s;
+    }
+
+    @keyframes swordGlow {
+      0%, 100% {
+        box-shadow: 0 0 8px #a1c4fd, 0 0 15px #a1c4fd, 0 0 25px #a1c4fd;
+      }
+      50% {
+        box-shadow: 0 0 20px #d0e4ff, 0 0 40px #d0e4ff, 0 0 60px #d0e4ff;
+      }
+    }
+
+    #splash-text {
+      font-family: 'UnifrakturCook', cursive;
+      font-size: 3.5rem;
+      color: #fff;
+      margin-top: 30px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .letter {
+      opacity: 0.2;
+      animation: footsteps 1.5s infinite forwards;
+    }
+
+    .letter:nth-child(1) { animation-delay: 0s; }
+    .letter:nth-child(2) { animation-delay: 0.15s; }
+    .letter:nth-child(3) { animation-delay: 0.3s; }
+    .letter:nth-child(4) { animation-delay: 0.45s; }
+    .letter:nth-child(5) { animation-delay: 0.6s; }
+    .letter:nth-child(6) { animation-delay: 0.75s; }
+    .letter:nth-child(7) { animation-delay: 0.9s; }
+    .letter:nth-child(8) { animation-delay: 1.05s; }
+    .letter:nth-child(9) { animation-delay: 1.2s; }
+    .letter:nth-child(10) { animation-delay: 1.35s; }
+    .letter:nth-child(11) { animation-delay: 1.5s; }
+
+    @keyframes footsteps {
+      0%, 100% { opacity: 0.2; }
+      50% { opacity: 1; }
+    }
+
+    #main-content {
+      visibility: hidden;
+    }
+
+    .anime-card {
+      perspective: 1000px;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 400px;
+      transition: transform 0.8s;
+      transform-style: preserve-3d;
+    }
+
+    .anime-card.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-front, .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .card-front {
+      background: #fff;
+    }
+
+    .card-back {
+      background: #222;
+      color: #fff;
+      transform: rotateY(180deg);
+      padding: 15px;
+      font-size: 0.9rem;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Splash Screen -->
+  <div id="splash-screen" role="alert" aria-live="assertive" aria-atomic="true">
+    <div style="display:flex; align-items:center;">
+      <div class="sword"></div>
+      <div class="sword second"></div>
+    </div>
+    <div id="splash-text" aria-label="Anime Vault Loading">
+      <span class="letter">A</span>
+      <span class="letter">n</span>
+      <span class="letter">i</span>
+      <span class="letter">m</span>
+      <span class="letter">e</span>
+      <span class="letter"> </span>
+      <span class="letter">V</span>
+      <span class="letter">a</span>
+      <span class="letter">u</span>
+      <span class="letter">l</span>
+      <span class="letter">t</span>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div id="main-content">
+    <header>
+      <div class="container">
+        <h1>My Anime Vault</h1>
+        <nav>
+          <ul class="nav-links">
+            <li><a href="index.html" class="active" aria-current="page">Home</a></li>
+            <li><a href="watchlist.html">Watchlist</a></li>
+            <li><a href="reviews.html">Reviews</a></li>
+            <li><a href="about.html">About</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <section class="anime-section">
+      <div class="glass-container">
+        <h2>Trending Anime</h2>
+        <div class="anime-grid">
+          <!-- Card 1 -->
+          <div class="anime-card" tabindex="0" role="button" aria-label="Flip Attack on Titan card" onclick="flipCard(this)" onkeydown="handleCardKey(event, this)">
+            <div class="card-inner">
+              <div class="card-front">
+                <img src="https://img.flawlessfiles.com/_r/300x400/100/de/bf/debf027d032c6d40b91fab16b2ff9bd4/debf027d032c6d40b91fab16b2ff9bd4.jpg" alt="Attack on Titan" style="width: 100%; height: 100%; object-fit: cover;">
+              </div>
+              <div class="card-back">
+                <h3>Attack on Titan</h3>
+                <p>In a world besieged by Titans, Eren Yeager joins the Scout Regiment to fight for survival and uncover shocking truths about humanity’s existence.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="anime-card" tabindex="0" role="button" aria-label="Flip Demon Slayer card" onclick="flipCard(this)" onkeydown="handleCardKey(event, this)">
+            <div class="card-inner">
+              <div class="card-front">
+                <img src="https://img.flawlessfiles.com/_r/300x400/100/30/df/30df93feaa422101659e14d0a2a2f582/30df93feaa422101659e14d0a2a2f582.jpg" alt="Demon Slayer" style="width: 100%; height: 100%; object-fit: cover;">
+              </div>
+              <div class="card-back">
+                <h3>Demon Slayer</h3>
+                <p>Tanjiro Kamado’s family is killed by demons. He becomes a slayer to save his sister Nezuko and destroy the demon threat with unwavering resolve.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="anime-card" tabindex="0" role="button" aria-label="Flip My Hero Academia card" onclick="flipCard(this)" onkeydown="handleCardKey(event, this)">
+            <div class="card-inner">
+              <div class="card-front">
+                <img src="https://cdn.myanimelist.net/images/anime/10/78745.jpg" alt="My Hero Academia" style="width: 100%; height: 100%; object-fit: cover;">
+              </div>
+              <div class="card-back">
+                <h3>My Hero Academia</h3>
+                <p>Izuku Midoriya inherits the power of the #1 hero and trains to become a symbol of peace in a world full of powerful “Quirks.”</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <p>&copy; 2025 Anime Vault Watchlist. Your gateway to top anime picks and reviews.</p>
+    </footer>
+  </div>
+
+  <script>
+    // Splash screen transition
+    window.onload = function() {
+      const splash = document.getElementById('splash-screen');
+      const mainContent = document.getElementById('main-content');
+      setTimeout(() => {
+        splash.style.opacity = '0';
+        setTimeout(() => {
+          splash.style.display = 'none';
+          mainContent.style.visibility = 'visible';
+        }, 800);
+      }, 1500);
+    };
+
+    // Flip card interaction
+    function flipCard(card) {
+      if (card.classList.contains('flipping')) return;
+      card.classList.add('flipping');
+      card.classList.toggle('flipped');
+      setTimeout(() => {
+        card.classList.remove('flipping');
+        card.setAttribute('aria-pressed', card.classList.contains('flipped'));
+      }, 900);
+    }
+
+    function handleCardKey(event, card) {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        flipCard(card);
+      }
+    }
+  </script>
+</body>
+</html>

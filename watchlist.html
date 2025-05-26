@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AV-Watchlist</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Minimal modal styling */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 10;
+      left: 0; top: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: #222;
+      color: #eee;
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 400px;
+      position: relative;
+    }
+    .close-btn {
+      position: absolute;
+      top: 10px; right: 15px;
+      font-size: 22px;
+      cursor: pointer;
+      color: #fff;
+    }
+    label {
+      display: block;
+      margin: 15px 0 5px 0;
+      font-weight: bold;
+    }
+    textarea {
+      width: 100%;
+      height: 70px;
+      border-radius: 5px;
+      padding: 8px;
+      background: #111;
+      border: 1px solid #555;
+      color: #eee;
+      resize: vertical;
+    }
+    input[type="submit"] {
+      margin-top: 15px;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      background: #007bff;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .stars {
+      display: flex;
+      gap: 5px;
+      cursor: pointer;
+    }
+    .star {
+      font-size: 25px;
+      color: #666;
+    }
+    .star.selected,
+    .star:hover,
+    .star:hover ~ .star {
+      color: gold;
+    }
+
+    /* Flipping card container effect*/
+    .anime-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 20px 0;
+    }
+
+    .anime-card {
+      width: 250px;
+      height: 370px;
+      perspective: 1000px;
+      cursor: pointer;
+      margin: 0 auto;
+    }
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.8s;
+      transform-style: preserve-3d;
+    }
+    .anime-card.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-front, .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 10px;
+      backface-visibility: hidden;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+      overflow-y: auto;
+      background: #111;
+      color: #eee;
+    }
+
+    .card-front img {
+      width: 100%;
+      height: 300px;
+      border-radius: 10px 10px 0 0;
+      object-fit: cover;
+      display: block;
+    }
+    .card-front p {
+      margin: 10px;
+      font-weight: bold;
+      font-size: 18px;
+      text-align: center;
+    }
+
+    .card-back {
+      transform: rotateY(180deg);
+      padding: 15px;
+      font-size: 14px;
+      line-height: 1.3;
+    }
+
+    .card-back h3 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 18px;
+      text-align: center;
+    }
+
+    .card-back .synopsis {
+      max-height: 130px;
+      overflow-y: auto;
+      margin-bottom: 10px;
+      text-align: justify;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    /* Review form inside card back */
+    .card-back label {
+      font-weight: bold;
+      margin-top: 8px;
+      display: block;
+    }
+    .card-back textarea {
+      width: 100%;
+      height: 50px;
+      font-size: 14px;
+      padding: 5px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      resize: vertical;
+      background: #222;
+      border: 1px solid #444;
+      color: #eee;
+    }
+    .card-back input[type="submit"] {
+      width: 100%;
+      padding: 8px;
+      background: #007bff;
+      border: none;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    /* Stars inside card back */
+    .card-back .stars {
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+    .card-back .star {
+      font-size: 20px;
+    }
+
+    /* Vault button styling */
+    #vaultButton {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 25px;
+      font-size: 16px;
+      font-weight: bold;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    #vaultButton:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>My Anime Vault</h1>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="watchlist.html" class="active" aria-current="page">Watchlist</a></li>
+          <li><a href="reviews.html">Reviews</a></li>
+          <li><a href="about.html">About</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="anime-section">
+    <div class="glass-container">
+      <h2>The Vault Watchlist</h2>
+      <div class="anime-grid" id="animeGrid">
+        <!-- Anime cards are inserted here by JS -->
+      </div>
+      <button id="vaultButton">Open Vault</button>
+    </div>
+  </main>
+
+  <!-- Modal for adding review (existing, kept for backward compatibility) -->
+  <div class="modal" id="reviewModal">
+    <div class="modal-content">
+      <span class="close-btn" id="closeModal">&times;</span>
+      <h3 id="modalAnimeTitle">Review Anime</h3>
+      <img id="modalAnimeImage" src="" alt="" style="width: 150px; border-radius: 8px; display: block; margin: 0 auto 15px;" />
+      
+      <form id="reviewForm">
+        <label for="rating">Rating:</label>
+        <div class="stars" id="starRating">
+          <span class="star" data-value="1">&#9733;</span>
+          <span class="star" data-value="2">&#9733;</span>
+          <span class="star" data-value="3">&#9733;</span>
+          <span class="star" data-value="4">&#9733;</span>
+          <span class="star" data-value="5">&#9733;</span>
+        </div>
+
+        <label for="comment">Comment:</label>
+        <textarea id="comment" name="comment" placeholder="Write your review here..." required></textarea>
+
+        <input type="submit" value="Submit Review" />
+      </form>
+    </div>
+  </div>
+
+<script>
+  // Complete anime data with synopsis paragraphs (first 4 shown initially, next 4 revealed by vault button)
+  const animeList = [
+    // Initial 4 anime (keep your existing synopsis, truncated to 2 paragraphs for brevity here)
+    {
+      name: "A silent voice",
+      image: "https://img.flawlessfiles.com/_r/300x400/100/7f/c6/7fc61d82b89949dff4319bd73ff2d456/7fc61d82b89949dff4319bd73ff2d456.jpg",
+      synopsis: [
+        "A Silent Voice follows the story of Shoya Ishida, a former bully who seeks redemption by reaching out to Shoko Nishimiya, a deaf girl he once tormented in elementary school.",
+        "The film explores themes of bullying, disability, forgiveness, and the difficulty of communication. It is a deeply emotional and beautifully animated film.",
+        "Throughout the movie, Shoya learns the consequences of his actions and tries to make amends with Shoko and his classmates, while facing his own guilt and loneliness.",
+        "The story provides a realistic look at social stigma and the struggle for acceptance, making it a compelling and heartfelt experience."
+      ]
+    },
+    {
+  "name": "Code Geass",
+  "image": "https://cdn.myanimelist.net/images/anime/4/9391.jpg",
+  "synopsis": [
+    "Code Geass centers on Lelouch Lamperouge, a high school student who gains a mysterious power called Geass, allowing him to command anyone to obey his orders.",
+    "Set in an alternate history where the Holy Britannian Empire conquers Japan, Lelouch becomes the masked vigilante Zero to overthrow Britannia and seek justice.",
+    "The series blends mecha action, political intrigue, and complex character development, with moral ambiguity and dramatic twists.",
+    "It raises questions about power, sacrifice, and the costs of rebellion, making it a critically acclaimed anime."
+  ]
+},
+
+
+    {
+      name: "Fullmetal Alchemist Brotherhood",
+      image: "https://cdn.myanimelist.net/images/anime/1223/96541.jpg",
+      synopsis: [
+        "This anime follows two brothers, Edward and Alphonse Elric, who use alchemy in a quest to restore their bodies after a disastrous failed ritual.",
+        "The series is rich with themes of sacrifice, family bonds, and the consequences of human ambition.",
+        "It balances action, adventure, and deep emotional storytelling, with a fully realized fantasy world and well-developed characters.",
+        "Widely regarded as one of the best anime series ever made."
+      ]
+    },
+    {
+  name: "Death Parade",
+  image: "https://upload.wikimedia.org/wikipedia/en/f/f6/Death_Parade_Key_visual.png",
+  synopsis: [
+    "Death Parade is set in a mysterious bar where recently deceased people undergo judgment games to determine their fate.",
+    "The anime explores morality, human nature, and the value of life through intense psychological drama.",
+    "Each episode features a different pair of souls facing unique challenges, revealing their true selves under pressure.",
+    "It combines dark storytelling with beautiful animation and haunting music."
+  ]
+},
+    // Vault 4 anime with 5 paragraphs each
+    {
+      name: "Ghost in the Shell",
+      image: "https://cdn.myanimelist.net/images/anime/7/72549.jpg",
+      synopsis: [
+        "Ghost in the Shell is a cyberpunk anime focusing on Major Motoko Kusanagi, a cyborg agent in a futuristic world where technology blurs the line between human and machine.",
+        "The story explores themes of identity, consciousness, and the implications of advanced AI and cybernetics.",
+        "Set in a sprawling metropolis, the series presents philosophical questions about what it means to be human in a highly digitized society.",
+        "The series features intricate political intrigue, high-tech action scenes, and a haunting atmosphere.",
+        "It has been influential in the sci-fi genre, inspiring many films and other media."
+      ]
+    },
+    {
+      name: "Steins;Gate",
+      image: "https://cdn.myanimelist.net/images/anime/5/73199.jpg",
+      synopsis: [
+        "Steins;Gate follows Rintarou Okabe, a self-proclaimed mad scientist, and his friends who accidentally discover time travel through a microwave device.",
+        "The series combines science fiction with thrilling suspense and emotional character arcs.",
+        "It carefully examines the consequences of altering the past and the butterfly effects that ripple through time.",
+        "With a blend of humor, romance, and tragedy, Steins;Gate crafts a compelling narrative that keeps viewers guessing.",
+        "It is praised for its tight plot, character development, and satisfying conclusion."
+      ]
+    },
+    {
+      name: "Made in Abyss",
+      image: "https://cdn.myanimelist.net/images/anime/10/78745.jpg",
+      synopsis: [
+        "Made in Abyss centers on a young girl, Riko, who descends into a mysterious, massive chasm called the Abyss to find her mother.",
+        "The Abyss is filled with strange creatures and relics but also harbors deadly curses and dangers.",
+        "The series contrasts its cute art style with dark, intense themes of survival, exploration, and sacrifice.",
+        "It delves into the mysteries of the Abyss while exploring friendship and determination.",
+        "Made in Abyss is noted for its breathtaking visuals and emotional depth."
+      ]
+    },
+    {
+      name: "Mob Psycho 100",
+      image: "https://cdn.myanimelist.net/images/anime/10/78745.jpg",
+      synopsis: [
+        "Mob Psycho 100 follows Shigeo 'Mob' Kageyama, a powerful psychic trying to live a normal life.",
+        "The anime explores themes of self-improvement, emotions, and identity, with a unique art style and energetic animation.",
+        "Mob struggles to control his powers and navigate adolescence while facing supernatural threats.",
+        "It combines humor, action, and heartfelt moments, offering a fresh take on the psychic genre.",
+        "The series has been praised for its creative visuals and emotional storytelling."
+      ]
+    }
+  ];
+
+  // Container for cards
+  const animeGrid = document.getElementById('animeGrid');
+  const vaultButton = document.getElementById('vaultButton');
+
+  // State: how many cards currently shown (start with 4)
+  let cardsShown = 4;
+
+  // Function to create a single anime card element
+  function createAnimeCard(anime, index) {
+    const card = document.createElement('div');
+    card.classList.add('anime-card');
+
+    card.innerHTML = `
+      <div class="card-inner">
+        <div class="card-front">
+          <img src="${anime.image}" alt="${anime.name}" />
+          <p>${anime.name}</p>
+        </div>
+        <div class="card-back">
+          <h3>${anime.name}</h3>
+          <div class="synopsis">${anime.synopsis.map(p => `<p>${p}</p>`).join('')}</div>
+          <label for="rating-${index}">Your Rating:</label>
+          <div class="stars" id="stars-${index}" data-index="${index}">
+            <span class="star" data-value="1">&#9733;</span>
+            <span class="star" data-value="2">&#9733;</span>
+            <span class="star" data-value="3">&#9733;</span>
+            <span class="star" data-value="4">&#9733;</span>
+            <span class="star" data-value="5">&#9733;</span>
+          </div>
+          <label for="comment-${index}">Your Comment:</label>
+          <textarea id="comment-${index}" rows="3" placeholder="Write your review here..."></textarea>
+          <input type="submit" value="Save Review" data-index="${index}" />
+        </div>
+      </div>
+    `;
+
+    // Flip card on click
+    card.addEventListener('click', (e) => {
+      // Prevent flipping when clicking input or textarea or stars
+      if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT' || e.target.classList.contains('star')) return;
+      card.classList.toggle('flipped');
+    });
+
+    return card;
+  }
+
+  // Render initial 4 cards
+  function renderCards(num) {
+    animeGrid.innerHTML = '';
+    for (let i = 0; i < num && i < animeList.length; i++) {
+      const card = createAnimeCard(animeList[i], i);
+      animeGrid.appendChild(card);
+    }
+    attachReviewHandlers();
+  }
+
+  // Save reviews in localStorage: keyed by "animeReview-{index}" as JSON {rating: int, comment: string}
+  function saveReview(index, rating, comment) {
+    const reviewData = { rating, comment };
+    localStorage.setItem(`animeReview-${index}`, JSON.stringify(reviewData));
+  }
+
+  // Load review from localStorage
+  function loadReview(index) {
+    const data = localStorage.getItem(`animeReview-${index}`);
+    return data ? JSON.parse(data) : null;
+  }
+
+  // Attach star rating and review save handlers for all cards currently displayed
+  function attachReviewHandlers() {
+    for (let i = 0; i < cardsShown; i++) {
+      const starsDiv = document.getElementById(`stars-${i}`);
+      const textarea = document.getElementById(`comment-${i}`);
+      const submitBtn = animeGrid.querySelector(`input[type="submit"][data-index="${i}"]`);
+
+      if (!starsDiv || !textarea || !submitBtn) continue;
+
+      // Load existing review if any
+      const existing = loadReview(i);
+      if (existing) {
+        setStarRating(starsDiv, existing.rating);
+        textarea.value = existing.comment;
+      } else {
+        setStarRating(starsDiv, 0);
+        textarea.value = '';
+      }
+
+      // Star hover and click handlers
+      starsDiv.querySelectorAll('.star').forEach(star => {
+        star.onmouseover = () => highlightStars(starsDiv, star.dataset.value);
+        star.onmouseout = () => setStarRating(starsDiv, getSelectedRating(starsDiv));
+        star.onclick = () => {
+          setStarRating(starsDiv, star.dataset.value);
+          starsDiv.dataset.selected = star.dataset.value;
+        };
+      });
+
+      // Submit button handler
+      submitBtn.onclick = (e) => {
+        e.preventDefault();
+        const rating = parseInt(getSelectedRating(starsDiv));
+        const comment = textarea.value.trim();
+        if (rating === 0) {
+          alert('Please select a rating before submitting.');
+          return;
+        }
+        saveReview(i, rating, comment);
+        alert('Review saved!');
+      };
+    }
+  }
+
+  function highlightStars(starsDiv, rating) {
+    starsDiv.querySelectorAll('.star').forEach(star => {
+      star.classList.toggle('selected', star.dataset.value <= rating);
+    });
+  }
+  function setStarRating(starsDiv, rating) {
+    starsDiv.dataset.selected = rating;
+    highlightStars(starsDiv, rating);
+  }
+  function getSelectedRating(starsDiv) {
+    return starsDiv.dataset.selected || 0;
+  }
+
+  // Vault button click: reveal all 8 cards
+  vaultButton.addEventListener('click', () => {
+    cardsShown = animeList.length;
+    renderCards(cardsShown);
+    vaultButton.style.display = 'none'; // hide vault button after opening
+  });
+
+  // Initial render 4 cards
+  renderCards(cardsShown);
+</script>
+<footer>
+  <p>&copy; 2025 Anime Vault Watchlist. Your gateway to top anime picks and reviews.</p>
+</footer>
+</body>
+</html>

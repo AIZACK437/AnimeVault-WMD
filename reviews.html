@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Anime Vault - Reviews</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    main {
+      padding: 2rem;
+    }
+
+    section.review-card {
+      display: flex;
+      gap: 1.5rem;
+      background: #11112a;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #004477;
+      margin-bottom: 1.5rem;
+      padding: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .review-card img {
+      width: 140px;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 2px solid #4af;
+    }
+
+    .review-content {
+      flex: 1;
+      min-width: 250px;
+      color: #6ef;
+    }
+
+    .review-content h3 {
+      margin: 0 0 0.5rem 0;
+      color: #6ef;
+    }
+
+    .stars {
+      color: #ffdd00;
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .review-content p {
+      font-style: italic;
+      color: #ccc;
+    }
+
+    .actions {
+      margin-top: 0.5rem;
+    }
+
+    .actions button {
+      margin-right: 10px;
+      padding: 5px 10px;
+      background: #4af;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+
+    .actions button:hover {
+      background: #3673b8;
+    }
+
+    #no-reviews {
+      text-align: center;
+      margin-top: 3rem;
+      color: #aaa;
+      font-size: 1.2rem;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      color: #aaa;
+      border-top: 1px solid #333;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="container">
+      <h1>My Anime Vault</h1>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="watchlist.html">Watchlist</a></li>
+          <li><a href="reviews.html" class="active" aria-current="page">Reviews</a></li>
+          <li><a href="about.html">About</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="anime-section">
+    <div class="glass-container">
+      <h2 id="reviews-heading">Anime Reviews</h2>
+      <div id="reviews" aria-labelledby="reviews-heading"></div>
+      <div id="no-reviews" style="display:none;">No reviews yet. Be the first to add one on the Home page!</div>
+    </div>
+  </main>
+
+  <script>
+    const animeImages = {
+      "Naruto": "images/naruto.jpg",
+      "Death Note": "images/deathnote.jpg",
+      "One Piece": "images/onepiece.jpg",
+      "Attack on Titan": "images/aot.jpg",
+      "Demon Slayer": "images/demonslayer.jpg"
+    };
+
+    const container = document.getElementById("reviews");
+    const noReviewsMsg = document.getElementById("no-reviews");
+
+    function renderReviews() {
+      container.innerHTML = "";
+      const reviews = JSON.parse(localStorage.getItem("animeReviews") || "[]");
+
+      if (reviews.length === 0) {
+        noReviewsMsg.style.display = "block";
+        return;
+      } else {
+        noReviewsMsg.style.display = "none";
+      }
+
+      reviews.forEach((review, index) => {
+        const section = document.createElement("section");
+        section.className = "review-card";
+        section.setAttribute("aria-label", `Review for ${review.animeName}`);
+
+        const imgSrc = animeImages[review.animeName] || "images/default.jpg";
+
+        let stars = "";
+        for (let i = 0; i < 5; i++) {
+          stars += i < review.rating ? "★" : "☆";
+        }
+
+        section.innerHTML = `
+          <img src="${imgSrc}" alt="${review.animeName} poster" />
+          <div class="review-content">
+            <h3>${review.animeName}</h3>
+            <p class="stars" aria-label="Rated ${review.rating} out of 5 stars">${stars}</p>
+            <p class="comment">"${review.comment}"</p>
+            <div class="actions">
+              <button onclick="editReview(${index})" aria-label="Edit review for ${review.animeName}">Edit</button>
+              <button onclick="deleteReview(${index})" aria-label="Delete review for ${review.animeName}">Delete</button>
+            </div>
+          </div>
+        `;
+
+        container.appendChild(section);
+      });
+    }
+
+    function editReview(index) {
+      const reviews = JSON.parse(localStorage.getItem("animeReviews") || "[]");
+      const review = reviews[index];
+      const newComment = prompt("Edit your comment:", review.comment);
+      if (newComment !== null && newComment.trim() !== "") {
+        review.comment = newComment.trim();
+        localStorage.setItem("animeReviews", JSON.stringify(reviews));
+        renderReviews();
+      }
+    }
+
+    function deleteReview(index) {
+      if (confirm("Are you sure you want to delete this review?")) {
+        const reviews = JSON.parse(localStorage.getItem("animeReviews") || "[]");
+        reviews.splice(index, 1);
+        localStorage.setItem("animeReviews", JSON.stringify(reviews));
+        renderReviews();
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", renderReviews);
+  </script>
+
+<footer>
+  <p>&copy; 2025 Anime Vault Watchlist. Your gateway to top anime picks and reviews.</p>
+</footer>
+
+</body>
+</html>
