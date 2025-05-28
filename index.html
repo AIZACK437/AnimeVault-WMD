@@ -166,12 +166,13 @@
   <div id="main-content">
     <header>
       <div class="container">
-        <h1>My Anime Vault</h1>
+        <h1>The Anime Vault</h1>
         <nav>
           <ul class="nav-links">
             <li><a href="index.html" class="active" aria-current="page">Home</a></li>
             <li><a href="watchlist.html">Watchlist</a></li>
             <li><a href="reviews.html">Reviews</a></li>
+            <li><a href="feedback.html">Feedback</a></li>
             <li><a href="about.html">About</a></li>
           </ul>
         </nav>
@@ -186,7 +187,7 @@
           <div class="anime-card" tabindex="0" role="button" aria-label="Flip Attack on Titan card" onclick="flipCard(this)" onkeydown="handleCardKey(event, this)">
             <div class="card-inner">
               <div class="card-front">
-                <img src="https://img.flawlessfiles.com/_r/300x400/100/de/bf/debf027d032c6d40b91fab16b2ff9bd4/debf027d032c6d40b91fab16b2ff9bd4.jpg" alt="Attack on Titan" style="width: 100%; height: 100%; object-fit: cover;">
+                <img src="https://img.flawlessfiles.com/_r/300x400/100/16/08/160831b6a0c1303e1439925d8f8c7395/160831b6a0c1303e1439925d8f8c7395.jpg" alt="Attack on Titan" style="width: 100%; height: 100%; object-fit: cover;">
               </div>
               <div class="card-back">
                 <h3>Attack on Titan</h3>
@@ -199,7 +200,7 @@
           <div class="anime-card" tabindex="0" role="button" aria-label="Flip Demon Slayer card" onclick="flipCard(this)" onkeydown="handleCardKey(event, this)">
             <div class="card-inner">
               <div class="card-front">
-                <img src="https://img.flawlessfiles.com/_r/300x400/100/30/df/30df93feaa422101659e14d0a2a2f582/30df93feaa422101659e14d0a2a2f582.jpg" alt="Demon Slayer" style="width: 100%; height: 100%; object-fit: cover;">
+                <img src="https://img.flawlessfiles.com/_r/300x400/100/db/2f/db2f3ce7b9cab7fdc160b005bffb899a/db2f3ce7b9cab7fdc160b005bffb899a.png" alt="Demon Slayer" style="width: 100%; height: 100%; object-fit: cover;">
               </div>
               <div class="card-back">
                 <h3>Demon Slayer</h3>
@@ -212,7 +213,7 @@
           <div class="anime-card" tabindex="0" role="button" aria-label="Flip My Hero Academia card" onclick="flipCard(this)" onkeydown="handleCardKey(event, this)">
             <div class="card-inner">
               <div class="card-front">
-                <img src="https://cdn.myanimelist.net/images/anime/10/78745.jpg" alt="My Hero Academia" style="width: 100%; height: 100%; object-fit: cover;">
+                <img src="https://img.flawlessfiles.com/_r/300x400/100/22/f0/22f07a9b643cdd601666c518fd59eec9/22f07a9b643cdd601666c518fd59eec9.jpg" alt="My Hero Academia" style="width: 100%; height: 100%; object-fit: cover;">
               </div>
               <div class="card-back">
                 <h3>My Hero Academia</h3>
@@ -229,37 +230,48 @@
     </footer>
   </div>
 
-  <script>
-    // Splash screen transition
-    window.onload = function() {
-      const splash = document.getElementById('splash-screen');
-      const mainContent = document.getElementById('main-content');
+ <script>
+  window.onload = function () {
+    const splash = document.getElementById('splash-screen');
+    const mainContent = document.getElementById('main-content');
+
+    // Check if splash screen has already been shown in this session
+    const hasShownSplash = sessionStorage.getItem('splashShown');
+
+    if (!hasShownSplash) {
+      // Show splash screen, then hide it and reveal main content
       setTimeout(() => {
         splash.style.opacity = '0';
         setTimeout(() => {
           splash.style.display = 'none';
           mainContent.style.visibility = 'visible';
+          sessionStorage.setItem('splashShown', 'true'); // mark splash as shown
         }, 800);
-      }, 1500);
-    };
-
-    // Flip card interaction
-    function flipCard(card) {
-      if (card.classList.contains('flipping')) return;
-      card.classList.add('flipping');
-      card.classList.toggle('flipped');
-      setTimeout(() => {
-        card.classList.remove('flipping');
-        card.setAttribute('aria-pressed', card.classList.contains('flipped'));
-      }, 900);
+      }, 1200);
+    } else {
+      // Skip splash screen
+      splash.style.display = 'none';
+      mainContent.style.visibility = 'visible';
     }
+  };
 
-    function handleCardKey(event, card) {
-      if (event.key === 'Enter' || event.key === ' ') {
-        event.preventDefault();
-        flipCard(card);
-      }
+  // Flip card interaction
+  function flipCard(card) {
+    if (card.classList.contains('flipping')) return;
+    card.classList.add('flipping');
+    card.classList.toggle('flipped');
+    setTimeout(() => {
+      card.classList.remove('flipping');
+      card.setAttribute('aria-pressed', card.classList.contains('flipped'));
+    }, 900);
+  }
+
+  function handleCardKey(event, card) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      flipCard(card);
     }
-  </script>
+  }
+</script>
 </body>
 </html>
